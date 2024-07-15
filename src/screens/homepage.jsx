@@ -3,9 +3,149 @@ import { Image, StyleSheet, View, TouchableOpacity, TextInput, Modal, TouchableW
 import Text from "../components/text";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
+import { useNavigation } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-const Homepage = () => {
+import ProfileScreen from "./profileScreen";
+
+const Stack = createStackNavigator();
+
+
+const Homepage = ({ route, navigation }) => {
+    const { userName, profilePic, email, password } = route.params;
     const [activeSection, setActiveSection] = useState("Home");
+
+
+    const handleMenuClick = (section) => {
+        setActiveSection(section);
+        
+        switch (section) {
+            case "Home":
+                // Navigate to Home screen
+                navigation.navigate('Home');
+                break;
+            case "Bookings":
+                // Navigate to Bookings screen
+                navigation.navigate('Bookings');
+                break;
+            case "Favorites":
+                // Navigate to Favorites screen
+                navigation.navigate('Favorites');
+                break;
+            case "Profile":
+                // Navigate to Profile screen
+                navigation.navigate('ProfileScreen', { userName, profilePic, email, password });
+                break;
+            default:
+                break;
+        }
+    };
+
+    return (
+        <View style={{ flex: 1 }}>
+            <Stack.Navigator initialRouteName="Home">
+                <Stack.Screen name="Home" component={HomeScreen} initialParams={{ userName, profilePic, email, password }} options={{ headerShown: false}}/>
+                <Stack.Screen name="Bookings" component={BookingsScreen} />
+                <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false}} />
+            </Stack.Navigator>
+
+            {/* Footer Menu */}
+            <View style={styles.menuBar}>
+                <View style={styles.menuItems}>
+                    <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => handleMenuClick("Home")}
+                        >
+                        <Image
+                            style={[
+                            styles.icon,
+                            activeSection === "Home" && styles.activeIcon,
+                            ]}
+                            resizeMode="cover"
+                            source={require("../images/home.png")}
+                        />
+                        <Text
+                            style={[
+                            styles.menuText,
+                            activeSection === "Home" && styles.activeMenuText,
+                            ]}
+                        >
+                            Home
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => handleMenuClick("Bookings")}
+                        >
+                        <Image
+                            style={[
+                            styles.icon,
+                            activeSection === "Bookings" && styles.activeIcon,
+                            ]}
+                            resizeMode="cover"
+                            source={require("../images/bookings.png")}
+                        />
+                        <Text
+                            style={[
+                            styles.menuText,
+                            activeSection === "Bookings" && styles.activeMenuText,
+                            ]}
+                        >
+                            Bookings
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => handleMenuClick("Favorites")}
+                        >
+                        <Image
+                            style={[
+                            styles.icon,
+                            activeSection === "Favorites" && styles.activeIcon,
+                            ]}
+                            resizeMode="cover"
+                            source={require("../images/favourites.png")}
+                        />
+                        <Text
+                            style={[
+                            styles.menuText,
+                            activeSection === "Favorites" && styles.activeMenuText,
+                            ]}
+                        >
+                            Favorites
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => handleMenuClick("Profile")}
+                        >
+                        <Image
+                            style={[
+                            styles.icon,
+                            activeSection === "Profile" && styles.activeIcon,
+                            ]}
+                            resizeMode="cover"
+                            source={require("../images/profile.png")}
+                        />
+                        <Text
+                            style={[
+                            styles.menuText,
+                            activeSection === "Profile" && styles.activeMenuText,
+                            ]}
+                        >
+                            Profile
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>
+    );
+};
+
+
+const HomeScreen = ({ route }) => {
+    const { userName, profilePic, email, password } = route.params;
+    
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -13,20 +153,25 @@ const Homepage = () => {
     const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [peopleCount, setPeopleCount] = useState(4);
     const [selectedTags, setSelectedTags] = useState([]);
-
+    const [filteredDeals, setFilteredDeals] = useState([]); // New state for filtered deals
+    const [location, setLocation] = useState("");
+    
+    const navigation = useNavigation();
 
     const tagsData = [
         { id: 1, name: 'Room' },
         { id: 2, name: 'Hotel' },
-        { id: 3, name: 'Online Booking' },
-        { id: 4, name: 'Trip Planner' },
-        { id: 5, name: 'Best Rates' },
+        { id: 3, name: 'Lodge' },
+        { id: 4, name: 'Trip' },
+        { id: 5, name: 'Affordable' },
         { id: 6, name: 'Leisure' },
-        { id: 7, name: 'Rate' },
-      ];
+        { id: 7, name: 'Vacation' },  
+        { id: 8, name: 'Luxury' }    
+    ];
+    
 
 
-      const dealsData = [
+    var dealsData = [
         {
             id: 1,
             title: 'Villa, De Retreat',
@@ -40,7 +185,7 @@ const Homepage = () => {
             title: 'Bungalow',
             rating: 4.90,
             price: '1500$',
-            image: require("../images/sample.png"),
+            image: require("../images/sample2.jpg"),
             category: ['Trip', 'Leisure'],
         },
         {
@@ -48,31 +193,31 @@ const Homepage = () => {
             title: 'Mountain Cabin',
             rating: 4.75,
             price: '950$',
-            image: require("../images/sample.png"),
-            category: ['Room', 'Leisure'],
+            image: require("../images/sample3.jpg"),
+            category: ['Room', 'Luxury'],
         },
         {
             id: 4,
             title: 'City Apartment',
             rating: 4.80,
             price: '1300$',
-            image: require("../images/sample.png"),
-            category: ['Hotel', 'Leisure'],
+            image: require("../images/sample4.jpg"),
+            category: ['Vacation', 'Leisure'],
         },
         {
             id: 5,
             title: 'Countryside',
             rating: 4.70,
             price: '1100$',
-            image: require("../images/sample.png"),
-            category: ['Room', 'Trip'],
+            image: require("../images/sample5.jpg"),
+            category: ['Leisure', 'Trip'],
         },
         {
             id: 6,
             title: 'Lakeside Lodge',
             rating: 4.95,
             price: '1400$',
-            image: require("../images/sample.png"),
+            image: require("../images/sample3.jpg"),
             category: ['Room', 'Leisure'],
         },
         {
@@ -80,23 +225,23 @@ const Homepage = () => {
             title: 'Desert Oasis',
             rating: 4.65,
             price: '1600$',
-            image: require("../images/sample.png"),
-            category: ['Trip', 'Hotel'],
+            image: require("../images/sample2.jpg"),
+            category: ['Vacation', 'Hotel'],
         },
         {
             id: 8,
             title: 'Forest Haven',
             rating: 4.85,
             price: '1250$',
-            image: require("../images/sample.png"),
-            category: ['Leisure', 'Hotel'],
+            image: require("../images/sample1.png"),
+            category: ['Leisure', 'Lodge'],
         },
         {
             id: 9,
             title: 'PentHouse',
             rating: 4.90,
             price: '2000$',
-            image: require("../images/sample.png"),
+            image: require("../images/sample5.jpg"),
             category: ['Room', 'Hotel'],
         },
         {
@@ -104,8 +249,8 @@ const Homepage = () => {
             title: 'Cozy Cabin',
             rating: 4.80,
             price: '1000$',
-            image: require("../images/sample.png"),
-            category: ['Trip', 'Leisure'],
+            image: require("../images/sample4.jpg"),
+            category: ['Affordable', 'Trip'],
         },
     ];
     
@@ -118,10 +263,6 @@ const Homepage = () => {
 
     const decrementCount = () => {
         setPeopleCount(prevCount => (prevCount > 1 ? prevCount - 1 : prevCount));
-    };
-
-    const handleMenuClick = (section) => {
-        setActiveSection(section);
     };
 
     const showStartDatepicker = () => {
@@ -169,15 +310,29 @@ const Homepage = () => {
     const handleCancel = () => {
         toggleSettingsModal();
         setSelectedTags([]);
+        setFilteredDeals([]);
     };
     
     const handleApply = () => {
         console.log('Selected tags:', selectedTags);
         toggleSettingsModal();
+
+        const filteredDeals = dealsData.filter(deal =>
+            deal.category.some(category => selectedTags.includes(category))
+        );
+        setFilteredDeals(filteredDeals); // Store filtered deals in state
     };
     
     const isTagSelected = (tagName) => {
         return selectedTags.includes(tagName);
+    };
+
+    const handleLocationChange = (text) => {
+        setLocation(text);
+    };
+
+    const handleLocationTap = () => {
+        navigation.navigate('MapScreen');
     };
 
     
@@ -187,11 +342,11 @@ const Homepage = () => {
         <Image
           style={styles.profilePic}
           resizeMode="cover"
-          source={require("../images/profile-icon.png")}
+          source={profilePic}
         />
         <View>
           <Text style={styles.helloText}>Hello,</Text>
-          <Text style={styles.nameText}>Billy</Text>
+          <Text style={styles.nameText}>{userName}</Text>
         </View>
       </View>
 
@@ -279,18 +434,19 @@ const Homepage = () => {
             </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.datePicker}>
+        <TouchableOpacity style={styles.locationBar} onPress={handleLocationTap}>
             <Image
-                style={styles.calendarIcon}
+                style={styles.locationIcon}
                 resizeMode="cover"
                 source={require("../images/location-icon.png")}
             />
             <TextInput
-                style={styles.dateTextInput}
+                style={styles.locationTextInput}
                 placeholder="Going to?"
                 placeholderTextColor="#000" // Set the placeholder text color to black
                 editable={false}
-                value={formatDates()}
+                value={location}
+                // onChangeText={(text) => handleLocationChange(text)}
             />
        </TouchableOpacity>
 
@@ -348,7 +504,7 @@ const Homepage = () => {
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {dealsData.map((item) => (
+            {(filteredDeals.length > 0 ? filteredDeals : dealsData).map((item) => (
                 <View key={item.id} style={styles.dealCard}>
                     <Image
                         style={styles.dealImage}
@@ -386,101 +542,20 @@ const Homepage = () => {
                 </View>
             ))}
         </ScrollView>
-
-
-
-        
-        <View style={styles.menuBar}>
-        <View style={styles.menuItems}>
-            <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => handleMenuClick("Home")}
-            >
-            <Image
-                style={[
-                styles.icon,
-                activeSection === "Home" && styles.activeIcon,
-                ]}
-                resizeMode="cover"
-                source={require("../images/home.png")}
-            />
-            <Text
-                style={[
-                styles.menuText,
-                activeSection === "Home" && styles.activeMenuText,
-                ]}
-            >
-                Home
-            </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => handleMenuClick("Bookings")}
-            >
-            <Image
-                style={[
-                styles.icon,
-                activeSection === "Bookings" && styles.activeIcon,
-                ]}
-                resizeMode="cover"
-                source={require("../images/bookings.png")}
-            />
-            <Text
-                style={[
-                styles.menuText,
-                activeSection === "Bookings" && styles.activeMenuText,
-                ]}
-            >
-                Bookings
-            </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => handleMenuClick("Favorites")}
-            >
-            <Image
-                style={[
-                styles.icon,
-                activeSection === "Favorites" && styles.activeIcon,
-                ]}
-                resizeMode="cover"
-                source={require("../images/favourites.png")}
-            />
-            <Text
-                style={[
-                styles.menuText,
-                activeSection === "Favorites" && styles.activeMenuText,
-                ]}
-            >
-                Favorites
-            </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => handleMenuClick("Profile")}
-            >
-            <Image
-                style={[
-                styles.icon,
-                activeSection === "Profile" && styles.activeIcon,
-                ]}
-                resizeMode="cover"
-                source={require("../images/profile.png")}
-            />
-            <Text
-                style={[
-                styles.menuText,
-                activeSection === "Profile" && styles.activeMenuText,
-                ]}
-            >
-                Profile
-            </Text>
-            </TouchableOpacity>
-        </View>
-        </View>
     </View>
   );
 };
+
+
+const BookingsScreen = ({ route }) => {
+    // Screen content for Bookings
+    return (
+        <View>
+            <Text>Bookings Screen</Text>
+        </View>
+    );
+};
+
 
 const styles = StyleSheet.create({
   container: {
@@ -523,12 +598,34 @@ greeting: {
     marginLeft: 20,
     marginRight: 20,
   },
+  locationBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    // justifyContent: "center",
+    padding: 0,
+    backgroundColor: 'white',
+    width: '90%',  // Adjust width as per your preference
+    borderRadius: 10,
+    marginTop: 10,
+    marginLeft: 20,
+    marginRight: 20,
+  },
   calendarIcon: {
     width: 20,
     height: 20,
     marginHorizontal: 10,
   },
+  locationIcon: {
+    width: 20,
+    height: 20,
+    marginHorizontal: 10,
+  },
   dateTextInput: {
+    flex: 1,
+    fontSize: 14,
+    color: "#000",
+  },
+  locationTextInput: {
     flex: 1,
     fontSize: 14,
     color: "#000",

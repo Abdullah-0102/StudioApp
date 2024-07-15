@@ -23,6 +23,27 @@ const Login = () => {
 
   const navigation = useNavigation();
 
+
+  const userData = [
+    {
+      id: 1,
+      userName: 'Mark',
+      email: 'abi220419@gmail.com',
+      password: '11223344',
+      profilePic: require('../images/profile-icon.png'), // Adjust path as needed
+    },
+    {
+      id: 2,
+      userName: 'Jane Smith',
+      email: 'janesmith@example.com',
+      password: '11223344',
+      profilePic: require('../images/profile-icon.png'), // Adjust path as needed
+    },
+  ];
+
+  
+
+
   const validateEmail = (input) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(input);
@@ -61,9 +82,17 @@ const Login = () => {
       return;
     }
 
-    if (email === hardcodedEmail && password === hardcodedPassword) {
-      navigation.navigate('HomePage');
-    } else {
+    const foundUser = userData.find(user => user.email === email && user.password === password);
+
+    if (foundUser) {
+      navigation.navigate('HomePage', {
+        userName: foundUser.userName,
+        profilePic: foundUser.profilePic,
+        email: foundUser.email,
+        password: foundUser.password,
+      });
+    } 
+    else {
       Alert.alert('Login Failed', 'Invalid email or password.');
     }
   };
