@@ -6,6 +6,7 @@ import Login from "../screens/login";
 import Homepage from '../screens/homepage';
 import MapScreen from '../screens/mapScreen';
 import UpdatePasswordScreen from '../screens/updatePassword';
+import UpdateUsernameScreen from '../screens/updateUserName';
 
 // import ForgotPasswordScreen from '../screens/forgotPassword';
 // import SetNewPasswordScreen from '../screens/setNewPassword';
@@ -52,6 +53,11 @@ const Navigator = () => {
           <Stack.Screen
             name="UpdatePassword"
             component={UpdatePasswordScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="UpdateUsername"
+            component={UpdateUsernameScreen}
             options={{headerShown: false}}
           />
           

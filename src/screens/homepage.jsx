@@ -335,6 +335,9 @@ const HomeScreen = ({ route }) => {
         navigation.navigate('MapScreen');
     };
 
+    // const handleBookNow = (item) => {
+    // };
+
     
   return (
     <View style={styles.container}>
