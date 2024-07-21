@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import { Image, StyleSheet, View, TouchableOpacity, TextInput, Modal, TouchableWithoutFeedback, ScrollView } from "react-native";
 import Text from "../components/text";
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -6,7 +6,11 @@ import moment from 'moment';
 import { useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
+import { useFavorites } from "../contexts/favoritesContext";
+
 import ProfileScreen from "./profileScreen";
+import FavoritesScreen from "./favoritesScreen";
+import BookingsScreen from "./bookingsScreen";
 
 const Stack = createStackNavigator();
 
@@ -44,8 +48,9 @@ const Homepage = ({ route, navigation }) => {
     return (
         <View style={{ flex: 1 }}>
             <Stack.Navigator initialRouteName="Home">
-                <Stack.Screen name="Home" component={HomeScreen} initialParams={{ userName, profilePic, email, password }} options={{ headerShown: false}}/>
-                <Stack.Screen name="Bookings" component={BookingsScreen} />
+                <Stack.Screen name="Home" component={HomeScreen} initialParams={{ userName, profilePic }} options={{ headerShown: false}}/>
+                <Stack.Screen name="Bookings" component={BookingsScreen} options={{ headerShown: false}}/>
+                <Stack.Screen name="Favorites" component={FavoritesScreen} options={{ headerShown: false}}/>
                 <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false}} />
             </Stack.Navigator>
 
@@ -144,17 +149,19 @@ const Homepage = ({ route, navigation }) => {
 
 
 const HomeScreen = ({ route }) => {
-    const { userName, profilePic, email, password } = route.params;
+    const { userName, profilePic } = route.params;
     
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
-    const [peopleCount, setPeopleCount] = useState(4);
+    const [peopleCount, setPeopleCount] = useState(1);
     const [selectedTags, setSelectedTags] = useState([]);
     const [filteredDeals, setFilteredDeals] = useState([]); // New state for filtered deals
     const [location, setLocation] = useState("");
+    const { favorites, toggleFavorite } = useFavorites(); // Use the context
+
     
     const navigation = useNavigation();
 
@@ -170,7 +177,6 @@ const HomeScreen = ({ route }) => {
     ];
     
 
-
     var dealsData = [
         {
             id: 1,
@@ -178,6 +184,7 @@ const HomeScreen = ({ route }) => {
             rating: 4.85,
             price: '1200$',
             image: require("../images/sample.png"),
+            image2: require("../images/sample.png"),
             category: ['Room', 'Hotel'],
         },
         {
@@ -186,6 +193,7 @@ const HomeScreen = ({ route }) => {
             rating: 4.90,
             price: '1500$',
             image: require("../images/sample2.jpg"),
+            image2: require("../images/sample2.jpg"),
             category: ['Trip', 'Leisure'],
         },
         {
@@ -194,6 +202,7 @@ const HomeScreen = ({ route }) => {
             rating: 4.75,
             price: '950$',
             image: require("../images/sample3.jpg"),
+            image2: require("../images/sample3.jpg"),
             category: ['Room', 'Luxury'],
         },
         {
@@ -202,6 +211,7 @@ const HomeScreen = ({ route }) => {
             rating: 4.80,
             price: '1300$',
             image: require("../images/sample4.jpg"),
+            image2: require("../images/sample4.jpg"),
             category: ['Vacation', 'Leisure'],
         },
         {
@@ -210,6 +220,7 @@ const HomeScreen = ({ route }) => {
             rating: 4.70,
             price: '1100$',
             image: require("../images/sample5.jpg"),
+            image2: require("../images/sample5.jpg"),
             category: ['Leisure', 'Trip'],
         },
         {
@@ -218,6 +229,7 @@ const HomeScreen = ({ route }) => {
             rating: 4.95,
             price: '1400$',
             image: require("../images/sample3.jpg"),
+            image2: require("../images/sample3.jpg"),
             category: ['Room', 'Leisure'],
         },
         {
@@ -226,6 +238,7 @@ const HomeScreen = ({ route }) => {
             rating: 4.65,
             price: '1600$',
             image: require("../images/sample2.jpg"),
+            image2: require("../images/sample2.jpg"),
             category: ['Vacation', 'Hotel'],
         },
         {
@@ -234,6 +247,7 @@ const HomeScreen = ({ route }) => {
             rating: 4.85,
             price: '1250$',
             image: require("../images/sample1.png"),
+            image2: require("../images/sample1.png"),
             category: ['Leisure', 'Lodge'],
         },
         {
@@ -242,6 +256,7 @@ const HomeScreen = ({ route }) => {
             rating: 4.90,
             price: '2000$',
             image: require("../images/sample5.jpg"),
+            image2: require("../images/sample5.jpg"),
             category: ['Room', 'Hotel'],
         },
         {
@@ -250,9 +265,11 @@ const HomeScreen = ({ route }) => {
             rating: 4.80,
             price: '1000$',
             image: require("../images/sample4.jpg"),
+            image2: require("../images/sample4.jpg"),
             category: ['Affordable', 'Trip'],
         },
     ];
+    
     
     
 
@@ -334,9 +351,24 @@ const HomeScreen = ({ route }) => {
     const handleLocationTap = () => {
         navigation.navigate('MapScreen');
     };
-
-    // const handleBookNow = (item) => {
+    
+    // const toggleFavorite = (id, item) => {
+    //     setFavorites(prevFavorites => {
+    //         const newFavorites = { ...prevFavorites };
+    //         if (newFavorites[id]) {
+    //             delete newFavorites[id];
+    //         } else {
+    //             newFavorites[id] = true;
+    //         }
+    //         console.log(item);
+    //         console.log('Favorite Items:', Object.keys(newFavorites));
+    //         return newFavorites;
+    //     });
     // };
+
+    const handleBookNow = (item) => {
+        navigation.navigate('StudioDetails', { deal: item }); // Navigate to details screen with item data
+    };
 
     
   return (
@@ -449,7 +481,6 @@ const HomeScreen = ({ route }) => {
                 placeholderTextColor="#000" // Set the placeholder text color to black
                 editable={false}
                 value={location}
-                // onChangeText={(text) => handleLocationChange(text)}
             />
        </TouchableOpacity>
 
@@ -499,8 +530,6 @@ const HomeScreen = ({ route }) => {
         </Modal>
 
 
-
-
         <View style={styles.horizontalRow} />
         <View style={styles.lastMinuteContainer}>
             <Text style={styles.lastMinuteText}>Last Minute Deals</Text>
@@ -514,6 +543,13 @@ const HomeScreen = ({ route }) => {
                         resizeMode="cover"
                         source={item.image}
                     />
+                    <TouchableOpacity onPress={() => toggleFavorite(item.id)}>
+                        <Image
+                            style={[styles.favoritesIcon, { tintColor: favorites[item.id] ? '#F3592C' : '#C0C0C0' }]}
+                            resizeMode="cover"
+                            source={require("../images/favourites.png")} // Add your favorites icon image here
+                        />
+                    </TouchableOpacity>
                     <View style={styles.dealInfo}>
                         <View style={styles.mainInfoContainer}>
                             <View style={styles.leftInfo}>
@@ -539,7 +575,7 @@ const HomeScreen = ({ route }) => {
                             </View>
                         </View>
                     </View>
-                    <TouchableOpacity style={styles.bookNowButton}>
+                    <TouchableOpacity style={styles.bookNowButton} onPress={() => handleBookNow(item)}>
                         <Text style={styles.bookNowText}>Book Now</Text>
                     </TouchableOpacity>
                 </View>
@@ -547,16 +583,6 @@ const HomeScreen = ({ route }) => {
         </ScrollView>
     </View>
   );
-};
-
-
-const BookingsScreen = ({ route }) => {
-    // Screen content for Bookings
-    return (
-        <View>
-            <Text>Bookings Screen</Text>
-        </View>
-    );
 };
 
 
@@ -809,7 +835,14 @@ lastMinuteText: {
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 10, // for Android
-},
+    },
+    favoritesIcon: {
+        position: 'absolute', // Position it absolutely within the parent
+        top: -90, // Adjust as needed
+        right: 10, // Adjust as needed
+        width: 24, // Adjust size as needed
+        height: 24, // Adjust size as needed
+    },
     dealImage: {
         width: "100%",
         height: 100,

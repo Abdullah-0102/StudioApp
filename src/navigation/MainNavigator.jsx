@@ -2,11 +2,13 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
+import SplashScreen from '../screens/splashScreen';
 import Login from "../screens/login";
 import Homepage from '../screens/homepage';
 import MapScreen from '../screens/mapScreen';
 import UpdatePasswordScreen from '../screens/updatePassword';
 import UpdateUsernameScreen from '../screens/updateUserName';
+import StudioDetailsScreen from '../screens/studioDetailsScreen';
 
 // import ForgotPasswordScreen from '../screens/forgotPassword';
 // import SetNewPasswordScreen from '../screens/setNewPassword';
@@ -34,7 +36,12 @@ const screenOptions = {
 const Navigator = () => {
     return (
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
+        <Stack.Navigator initialRouteName="SplashScreen">
+          <Stack.Screen
+            name="SplashScreen"
+            component={SplashScreen}
+            options={{headerShown: false}}
+          />
           <Stack.Screen
             name="Login"
             component={Login}
@@ -58,6 +65,11 @@ const Navigator = () => {
           <Stack.Screen
             name="UpdateUsername"
             component={UpdateUsernameScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="StudioDetails"
+            component={StudioDetailsScreen}
             options={{headerShown: false}}
           />
           
