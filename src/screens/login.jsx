@@ -23,7 +23,6 @@ const Login = () => {
 
   const navigation = useNavigation();
 
-
   const userData = [
     {
       id: 1,
@@ -40,9 +39,6 @@ const Login = () => {
       profilePic: require('../images/profile-icon.png'), // Adjust path as needed
     },
   ];
-
-  
-
 
   const validateEmail = (input) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -91,8 +87,7 @@ const Login = () => {
         email: foundUser.email,
         password: foundUser.password,
       });
-    } 
-    else {
+    } else {
       Alert.alert('Login Failed', 'Invalid email or password.');
     }
   };
@@ -165,6 +160,13 @@ const Login = () => {
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Log in</Text>
       </TouchableOpacity>
+
+      <View style={styles.signUpContainer}>
+        <Text style={styles.signUpText}>Don't have an account?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.signUpLink}> Sign Up Here.</Text>
+        </TouchableOpacity>
+      </View>
 
       <CustomAlert
         visible={alertVisible}
@@ -257,6 +259,20 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '500',
+  },
+  signUpContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  signUpText: {
+    color: 'gray',
+    fontSize: 14,
+  },
+  signUpLink: {
+    color: '#F3592C',
+    fontSize: 14,
     fontWeight: '500',
   },
 });

@@ -221,7 +221,7 @@ const MapScreen = () => {
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 15000,
+                    timeout: 60000,
                     maximumAge: 10000,
                 }
             );

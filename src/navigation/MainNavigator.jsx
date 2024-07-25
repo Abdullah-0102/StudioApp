@@ -4,6 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import SplashScreen from '../screens/splashScreen';
 import Login from "../screens/login";
+import SignUp from '../screens/signUp';
 import Homepage from '../screens/homepage';
 import MapScreen from '../screens/mapScreen';
 import UpdatePasswordScreen from '../screens/updatePassword';
@@ -48,6 +49,11 @@ const Navigator = () => {
             options={{headerShown: false}}
           />
           <Stack.Screen
+            name="SignUp"
+            component={SignUp}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
             name="HomePage"
             component={Homepage}
             options={{headerShown: false}}
@@ -72,15 +78,7 @@ const Navigator = () => {
             component={StudioDetailsScreen}
             options={{headerShown: false}}
           />
-          
-          {/* <Stack.Screen
-            name="SpecificSurvey"
-            component={SpecificSurvey}
-            options={({ route }) => ({
-              ...screenOptions,
-              headerTitle: route.params.location,
-            })}
-          /> */}
+
         </Stack.Navigator>
       </NavigationContainer>
     );
