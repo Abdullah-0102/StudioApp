@@ -150,7 +150,7 @@ const BookingsScreen = () => {
                 visible={showDeleteModal}
                 onRequestClose={toggleDeleteModal}
             >
-                <View style={styles.modalBackground}>
+                {/* <View style={styles.modalBackground}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Cancel Booking</Text>
                         <Text style={styles.modalSubtitle}>Are you sure you want to cancel this booking?</Text>
@@ -161,6 +161,43 @@ const BookingsScreen = () => {
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.modalButtonYes} onPress={handleCancelBooking}>
                                 <Text style={styles.modalButtonTextYes}>Yes, Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View> */}
+
+                <View style={styles.modalBackground}>
+                    <View style={styles.modalContainer}>
+                        <View style={styles.topBar} />
+                        <View style={styles.detailsModalContent}>
+                            <Text style={styles.detailsModalTitle}>Booking Details</Text>
+                            {selectedItem && (
+                                <View style={styles.detailsContainer}>
+                                    <View style={styles.detailsRow}>
+                                        <Text style={styles.detailsHeading}>Studio Name</Text>
+                                        <Text style={styles.detailsInfo}>{selectedItem.title}</Text>
+                                    </View>
+                                    <View style={styles.detailsRow}>
+                                        <Text style={styles.detailsHeading}>Booking Date & Time</Text>
+                                        <View style={styles.dateTimeContainer}>
+                                            <Text style={styles.detailsInfo}>7/21/2024</Text>
+                                            <Text style={styles.detailsInfo}>15:30pm</Text>
+                                        </View>
+                                    </View>
+                                    <View style={styles.detailsRow}>
+                                        <Text style={styles.detailsHeading}>Payment Status</Text>
+                                        <View style={styles.paymentStatus}>
+                                            <Text style={styles.paymentText}>Done</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            )}
+                            <TouchableOpacity style={styles.cancelButton} onPress={handleCancelBooking}>
+                                <Text style={styles.cancelButtonText}>Cancel Booking</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.contactButton}>
+                                <Image source={require('../images/support.png')} style={styles.contactIcon} />
+                                <Text style={styles.contactButtonText}>Contact Support</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -432,6 +469,23 @@ const styles = StyleSheet.create({
     },
     contactButtonText: {
         color: '#F3592C', // Text color #F3592C
+        fontSize: 16,
+        fontFamily: 'Inter-SemiBold',
+        marginLeft: 10, // Space between icon and text
+    },
+    cancelButton: {
+        backgroundColor: '#F3592C', // 10% opacity of #F3592C
+        padding: 15,
+        borderRadius: 7,
+        alignItems: 'center',
+        flexDirection: 'row', // Align items horizontally
+        justifyContent: 'center',
+        borderColor: '#F3592C', // Border color #F3592C
+        borderWidth: 1, // Define border width
+        marginBottom: 10,
+    },
+    cancelButtonText: {
+        color: 'white', // Text color #F3592C
         fontSize: 16,
         fontFamily: 'Inter-SemiBold',
         marginLeft: 10, // Space between icon and text

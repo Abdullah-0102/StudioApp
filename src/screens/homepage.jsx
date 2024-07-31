@@ -152,11 +152,13 @@ const HomeScreen = ({ route }) => {
     const { userName, profilePic } = route.params;
     
     const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    // const [endDate, setEndDate] = useState(null);
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-    const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+    // const [showEndDatePicker, setShowEndDatePicker] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [peopleCount, setPeopleCount] = useState(1);
+    const [isEditing, setIsEditing] = useState(false);
+    const [inputValue, setInputValue] = useState(String(peopleCount));    
     const [selectedTags, setSelectedTags] = useState([]);
     const [filteredDeals, setFilteredDeals] = useState([]); // New state for filtered deals
     const [location, setLocation] = useState("");
@@ -275,11 +277,29 @@ const HomeScreen = ({ route }) => {
 
 
     const incrementCount = () => {
-        setPeopleCount(prevCount => prevCount + 1);
+        setPeopleCount(prevCount => (prevCount < 10 ? prevCount + 1 : prevCount));
     };
 
     const decrementCount = () => {
         setPeopleCount(prevCount => (prevCount > 1 ? prevCount - 1 : prevCount));
+    };
+
+    const handleInputChange = (text) => {
+        const num = parseInt(text, 10);
+        if (!isNaN(num) && num >= 1 && num <= 10) {
+            setPeopleCount(num);
+            setInputValue(String(num));
+        } else {
+            setInputValue(text);
+        }
+    };
+
+    const handleInputBlur = () => {
+        setIsEditing(false);
+        if (inputValue === '' || parseInt(inputValue, 10) < 1) {
+            setPeopleCount(1);
+            setInputValue('1');
+        }
     };
 
     const showStartDatepicker = () => {
@@ -290,24 +310,30 @@ const HomeScreen = ({ route }) => {
         setShowStartDatePicker(false);
         const currentDate = selectedDate || startDate;
         setStartDate(currentDate);
-        setEndDate(null); // Reset end date when start date changes
-        if (currentDate) {
-            setShowEndDatePicker(true); // Automatically show end date picker after selecting start date
-        }
+        // setEndDate(null); // Reset end date when start date changes
+        // if (currentDate) {
+        //     setShowEndDatePicker(true); // Automatically show end date picker after selecting start date
+        // }
     };
 
-    const onEndDateChange = (event, selectedDate) => {
-        setShowEndDatePicker(false);
-        const currentDate = selectedDate || endDate;
-        setEndDate(currentDate);
-    };
+    // const onEndDateChange = (event, selectedDate) => {
+    //     setShowEndDatePicker(false);
+    //     const currentDate = selectedDate || endDate;
+    //     setEndDate(currentDate);
+    // };
 
+    // const formatDates = () => {
+    //     if (startDate && endDate) {
+    //         return `${moment(startDate).format('MMM DD')} - ${moment(endDate).format('MMM DD')}`;
+    //     } else if (startDate) {
+    //         return `${moment(startDate).format('MMM DD')}`;
+    //     }
+    //     return '';
+    // };
     const formatDates = () => {
-        if (startDate && endDate) {
-            return `${moment(startDate).format('MMM DD')} - ${moment(endDate).format('MMM DD')}`;
-        } else if (startDate) {
+        if (startDate) {
             return `${moment(startDate).format('MMM DD')}`;
-        }
+        } 
         return '';
     };
 
@@ -412,8 +438,7 @@ const HomeScreen = ({ route }) => {
             />
         </View>
         )}
-        {showEndDatePicker && (
-            <View style={styles.dateTimePickerContainer}>
+            {/* <View style={styles.dateTimePickerContainer}>
                 <DateTimePicker
                     value={endDate || new Date()}
                     mode="date"
@@ -422,8 +447,7 @@ const HomeScreen = ({ route }) => {
                     minimumDate={startDate || new Date()}
                     onChange={onEndDateChange}
                 />
-            </View>
-        )}
+            </View> */}
 
         <View style={styles.parentContainer}>
             <View style={styles.peopleCountContainer}>
@@ -433,7 +457,22 @@ const HomeScreen = ({ route }) => {
                         resizeMode="cover"
                         source={require("../images/persons.png")}
                     />
-                    <Text style={styles.peopleCountText}>{peopleCount} Person</Text>
+                    {isEditing ? (
+                        <TextInput
+                            style={styles.peopleCountInput}
+                            value={inputValue}
+                            onChangeText={handleInputChange}
+                            onBlur={handleInputBlur}
+                            keyboardType="numeric"
+                            autoFocus
+                        />
+                    ) : (
+                        <TouchableOpacity onPress={() => setIsEditing(true)}>
+                            <Text style={styles.peopleCountText}>
+                                {peopleCount} {peopleCount > 1 ? 'People' : 'Person'}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
                 <View style={styles.rightContainer}>
                     <TouchableOpacity onPress={decrementCount}>
@@ -576,7 +615,7 @@ const HomeScreen = ({ route }) => {
                         </View>
                     </View>
                     <TouchableOpacity style={styles.bookNowButton} onPress={() => handleBookNow(item)}>
-                        <Text style={styles.bookNowText}>Book Now</Text>
+                        <Text style={styles.bookNowText}>Check Times</Text>
                     </TouchableOpacity>
                 </View>
             ))}

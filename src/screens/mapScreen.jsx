@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions, Platform, Alert, TouchableOpacity, TextInput, Image, ScrollView, Modal } from "react-native";
+import { View, StyleSheet, Dimensions, Platform, Alert, TouchableOpacity, TextInput, Image, ScrollView } from "react-native";
 import Text from "../components/text";
 import MapView, { Marker } from "react-native-maps";
 import Geolocation from '@react-native-community/geolocation';
@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const GOOGLE_API_KEY = 'AIzaSyDMOtPK_TUmWOFdI99eDzqWjhVnmkUyLsQ'; 
+
 var dealsData = [
     {
         id: 1,
@@ -18,6 +19,7 @@ var dealsData = [
         image: require("../images/sample.png"),
         image2: require("../images/sample.png"),
         category: ['Room', 'Hotel'],
+        coordinates: { latitude: 33.6995, longitude: 73.0363 }
     },
     {
         id: 2,
@@ -27,6 +29,7 @@ var dealsData = [
         image: require("../images/sample2.jpg"),
         image2: require("../images/sample2.jpg"),
         category: ['Trip', 'Leisure'],
+        coordinates: { latitude: 34.6995, longitude: 72.0363 }
     },
     {
         id: 3,
@@ -36,6 +39,7 @@ var dealsData = [
         image: require("../images/sample3.jpg"),
         image2: require("../images/sample3.jpg"),
         category: ['Room', 'Luxury'],
+        coordinates: { latitude: 35.6995, longitude: 71.0363 }
     },
     {
         id: 4,
@@ -45,6 +49,7 @@ var dealsData = [
         image: require("../images/sample4.jpg"),
         image2: require("../images/sample4.jpg"),
         category: ['Vacation', 'Leisure'],
+        coordinates: { latitude: 36.6995, longitude: 70.0363 }
     },
     {
         id: 5,
@@ -54,6 +59,7 @@ var dealsData = [
         image: require("../images/sample5.jpg"),
         image2: require("../images/sample5.jpg"),
         category: ['Leisure', 'Trip'],
+        coordinates: { latitude: 32.6995, longitude: 74.0363 }
     },
     {
         id: 6,
@@ -63,6 +69,7 @@ var dealsData = [
         image: require("../images/sample3.jpg"),
         image2: require("../images/sample3.jpg"),
         category: ['Room', 'Leisure'],
+        coordinates: { latitude: 31.6995, longitude: 75.0363 }
     },
     {
         id: 7,
@@ -72,6 +79,7 @@ var dealsData = [
         image: require("../images/sample2.jpg"),
         image2: require("../images/sample2.jpg"),
         category: ['Vacation', 'Hotel'],
+        coordinates: { latitude: 30.6995, longitude: 76.0363 }
     },
     {
         id: 8,
@@ -81,6 +89,7 @@ var dealsData = [
         image: require("../images/sample1.png"),
         image2: require("../images/sample1.png"),
         category: ['Leisure', 'Lodge'],
+        coordinates: { latitude: 38.6995, longitude: 77.0363 }
     },
     {
         id: 9,
@@ -90,6 +99,7 @@ var dealsData = [
         image: require("../images/sample5.jpg"),
         image2: require("../images/sample5.jpg"),
         category: ['Room', 'Hotel'],
+        coordinates: { latitude: 37.6995, longitude: 78.0363 }
     },
     {
         id: 10,
@@ -99,6 +109,7 @@ var dealsData = [
         image: require("../images/sample4.jpg"),
         image2: require("../images/sample4.jpg"),
         category: ['Affordable', 'Trip'],
+        coordinates: { latitude: 40.79725, longitude: 79.0363 }
     },
 ];
 
@@ -112,6 +123,7 @@ const MapScreen = () => {
     const [markerCoordinate, setMarkerCoordinate] = useState(null);
     const [error, setError] = useState(null); // State to track errors
     const [showDetailsModal, setShowDetailsModal] = useState(true); // State to control modal visibility
+    const [selectedDeal, setSelectedDeal] = useState(null);
 
     const navigation = useNavigation();
 
@@ -217,7 +229,7 @@ const MapScreen = () => {
                 },
                 (error) => {
                     console.log(error);
-                    Alert.alert("Error getting location", error.message);
+                    Alert.alert("Error getting location", "Please turn on your location services.");
                 },
                 {
                     enableHighAccuracy: true,
@@ -239,8 +251,24 @@ const MapScreen = () => {
         return <View style={styles.container} />; // Show an empty view or a loading indicator while fetching location
     }
 
+
+    const handleMarkerPress = (deal) => {
+        setSelectedDeal(deal);
+    };
+    
+    const handleDetailPress = (deal) => {
+        if (deal) {
+          navigation.navigate('StudioDetails', { deal: deal });
+        }
+    };
+
     return (
         <View style={styles.container}>
+            <View style={styles.smallContainer}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Image source={require("../images/back-arrow.png")} style={styles.backArrow} />
+                </TouchableOpacity>
+            </View>
             <TouchableOpacity style={[styles.locationBar, isFocused && styles.focusedLocationBar]}>
                 <Image
                     style={styles.locationIcon}
@@ -255,7 +283,7 @@ const MapScreen = () => {
                     onChangeText={(text) => handleLocationChange(text)}
                     onFocus={() => {
                         setIsFocused(true);
-                        setShowDetailsModal(false); 
+                        // setShowDetailsModal(false); 
                     }}
                     onBlur={() => setIsFocused(false)}
                 />
@@ -309,7 +337,28 @@ const MapScreen = () => {
                         title="Selected Location"
                     />
                 )}
+
+                {dealsData.map((deal) => (
+                    <Marker
+                        key={deal.id}
+                        coordinate={deal.coordinates}
+                        title={deal.title}
+                        description={deal.price}
+                        pinColor="#F3592C" 
+                        onPress={() => handleMarkerPress(deal)}
+                    />
+                ))}
             </MapView>
+
+            {/* {selectedDeal && (
+              <View style={styles.detailView}>
+                <Text style={styles.detailText}>{selectedDeal.title}</Text>
+                <Text style={styles.detailText}>{selectedDeal.price}</Text>
+                <TouchableOpacity onPress={() => handleDetailPress(selectedDeal)}>
+                    <Text style={styles.detailLink}>View Details</Text>
+                </TouchableOpacity>
+              </View>
+            )} */}
 
              {/* Modal for recommended studios */}
             {showDetailsModal && (
@@ -354,6 +403,20 @@ const styles = StyleSheet.create({
         backgroundColor: "#f0f0f0",
         position: 'relative',
     },
+    backArrow: {
+        width: 25,
+        height: 25,
+        tintColor: 'black',
+        position: 'absolute',
+        // top: 15,
+        // left: 30,
+        // right: 20,
+        // paddingHorizontal: 10,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 5,
+        backgroundColor: "#fff",
+    },
     locationBar: {
         flexDirection: "row",
         alignItems: "center",
@@ -366,6 +429,16 @@ const styles = StyleSheet.create({
         borderColor: "#ccc",
         borderRadius: 5,
         backgroundColor: "#fff",
+        zIndex: 1,
+    },
+    smallContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        position: 'absolute',
+        top: 20,
+        left: 10,
+        right: 20,
+        paddingHorizontal: 10,
         zIndex: 1,
     },
     focusedLocationBar: {
@@ -420,6 +493,31 @@ const styles = StyleSheet.create({
         width: Dimensions.get("window").width,
         height: Dimensions.get("window").height,
     },
+
+    detailView: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        right: 20,
+        backgroundColor: 'white',
+        padding: 10,
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 5,
+      },
+      detailText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 5,
+      },
+      detailLink: {
+        color: 'blue',
+        marginTop: 10,
+        textAlign: 'center',
+      },
 
 
     // MODAL STYLINGS
