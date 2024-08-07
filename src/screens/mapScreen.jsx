@@ -301,26 +301,28 @@ const MapScreen = () => {
             </TouchableOpacity>
 
             {isFocused && predictions.length > 0 && (
-                <View
-                    style={styles.suggestionList}
-                >
-                    {predictions.map((item, index) => (
-                        <TouchableOpacity
-                            key={item.place_id}
-                            style={[styles.suggestion, { 
-                                backgroundColor: 'gray',
-                                borderBottomWidth: index !== predictions.length - 1 ? 1 : 0, 
-                                borderBottomColor: 'white' 
-                            }]}
-                            onPress={() => {
-                                handleSelectPrediction(item.place_id);
-                                console.log("Suggestion pressed:", item.place_id); 
-                            }}
-                        >
-                            <Text style={styles.suggestionText}>{item.description}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                <View style={styles.suggestionList}>
+                {predictions.map((item, index) => (
+                    <TouchableOpacity
+                        key={item.place_id}
+                        style={[styles.suggestion, { 
+                            borderBottomWidth: index !== predictions.length - 1 ? 1 : 0, 
+                            borderBottomColor: '#D3D3D3' 
+                        }]}
+                        onPress={() => {
+                            handleSelectPrediction(item.place_id);
+                            console.log("Suggestion pressed:", item.place_id); 
+                        }}
+                    >
+                        <Image 
+                            source={require('../images/location.png')} // Update the path to your location icon
+                            style={styles.icon}
+                        />
+                        <Text style={styles.suggestionText}>{item.description}</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+            
             )}
 
             {isFocused && error && (
@@ -479,18 +481,27 @@ const styles = StyleSheet.create({
         top: 106,
         left: 20,
         right: 20,
-        backgroundColor: '#fff',
-        borderRadius: 5,
+        backgroundColor: '#FFFFFF',
+        borderBottomLeftRadius: 15,
+        borderBottomRightRadius: 15,
         borderWidth: 1,
         borderColor: '#ccc',
         zIndex: 2,
-        maxHeight: 200, // Adjust as needed
+        maxHeight: 350, 
     },
     suggestion: {
         padding: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    icon: {
+        width: 11.5,  
+        height: 15, 
+        marginRight: 10, 
     },
     suggestionText: {
-        fontSize: 16,
+        color: 'black',
+        fontSize: 12,
     },
     errorContainer: {
         position: 'absolute',
