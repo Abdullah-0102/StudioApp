@@ -150,22 +150,6 @@ const BookingsScreen = () => {
                 visible={showDeleteModal}
                 onRequestClose={toggleDeleteModal}
             >
-                {/* <View style={styles.modalBackground}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Cancel Booking</Text>
-                        <Text style={styles.modalSubtitle}>Are you sure you want to cancel this booking?</Text>
-                        <Text style={styles.redText}>This action cannot be undone.</Text>
-                        <View style={styles.modalButtonContainer}>
-                            <TouchableOpacity style={styles.modalButtonNo} onPress={toggleDeleteModal}>
-                                <Text style={styles.modalButtonTextNo}>No</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalButtonYes} onPress={handleCancelBooking}>
-                                <Text style={styles.modalButtonTextYes}>Yes, Cancel</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View> */}
-
                 <View style={styles.modalBackground}>
                     <View style={styles.modalContainer}>
                         <View style={styles.topBar} />

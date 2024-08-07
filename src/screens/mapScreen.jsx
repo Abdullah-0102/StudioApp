@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions, Platform, Alert, TouchableOpacity, TextInput, Image, ScrollView } from "react-native";
+import { View, StyleSheet, Dimensions, Platform, Alert, TouchableOpacity, TextInput, Image, ScrollView, Modal} from "react-native";
 import Text from "../components/text";
 import MapView, { Marker } from "react-native-maps";
 import Geolocation from '@react-native-community/geolocation';
@@ -115,15 +115,22 @@ var dealsData = [
 
 
 const MapScreen = () => {
-    const [location, setLocation] = useState(null);
+    const [location, setLocation] = useState({
+        latitude: 33.6844,
+        longitude: 73.0479,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421
+    }); // Default location (e.g., Islamabad, Pakistan)
     const [searchLocation, setSearchLocation] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const [predictions, setPredictions] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [markerCoordinate, setMarkerCoordinate] = useState(null);
-    const [error, setError] = useState(null); // State to track errors
-    const [showDetailsModal, setShowDetailsModal] = useState(true); // State to control modal visibility
+    const [error, setError] = useState(null);
+    const [showDetailsModal, setShowDetailsModal] = useState(true); 
     const [selectedDeal, setSelectedDeal] = useState(null);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(''); 
 
     const navigation = useNavigation();
 
@@ -211,7 +218,9 @@ const MapScreen = () => {
         const getCurrentLocation = async () => {
             const hasPermission = await requestLocationPermission();
             if (!hasPermission) {
-                Alert.alert("Permission denied", "Location permission is required to use this feature.");
+                // Alert.alert("Permission denied", "Location permission is required to use this feature.");
+                setErrorMessage("Location permission is required to use this feature.");
+                setShowErrorModal(true);
                 return;
             }
 
@@ -229,7 +238,9 @@ const MapScreen = () => {
                 },
                 (error) => {
                     console.log(error);
-                    Alert.alert("Error getting location", "Please turn on your location services.");
+                    setErrorMessage("Please turn on your location services in order to fetch your current location, and reflect it on Map !");
+                    setShowErrorModal(true);
+                    // Alert.alert("Error getting location", "Please turn on your location services.");
                 },
                 {
                     enableHighAccuracy: true,
@@ -325,7 +336,7 @@ const MapScreen = () => {
                 showsUserLocation={true}
                 showsMyLocationButton={false}
                 followsUserLocation={true}
-                showsCompass={true}
+                showsCompass={false}
                 scrollEnabled={true}
                 zoomEnabled={true}
                 pitchEnabled={true}
@@ -350,16 +361,6 @@ const MapScreen = () => {
                 ))}
             </MapView>
 
-            {/* {selectedDeal && (
-              <View style={styles.detailView}>
-                <Text style={styles.detailText}>{selectedDeal.title}</Text>
-                <Text style={styles.detailText}>{selectedDeal.price}</Text>
-                <TouchableOpacity onPress={() => handleDetailPress(selectedDeal)}>
-                    <Text style={styles.detailLink}>View Details</Text>
-                </TouchableOpacity>
-              </View>
-            )} */}
-
              {/* Modal for recommended studios */}
             {showDetailsModal && (
             <View style={styles.modalBackground}>
@@ -378,7 +379,7 @@ const MapScreen = () => {
                                     key={deal.id}
                                     style={styles.cardContainer}
                                     onPress={() => {
-                                        navigation.navigate('StudioDetails', { deal: deal }); // Navigate to details screen with item data
+                                        navigation.navigate('StudioDetails', { deal: deal });
                                     }}
                                 >
                                     <Image
@@ -393,6 +394,25 @@ const MapScreen = () => {
                 </View>
             </View>
             )}
+
+            <Modal
+                visible={showErrorModal}
+                transparent={true}
+                animationType="fade"
+            >
+                <View style={styles.overlay}>
+                    <View style={styles.modalContainer1}>
+                        <Text style={styles.modalTitle1}>LOCATION ERROR</Text>
+                        <Text style={styles.modalMessage1}>{errorMessage}</Text>
+                        <TouchableOpacity 
+                            onPress={() => setShowErrorModal(false)} 
+                            style={styles.closeButton}
+                        >
+                            <Text style={styles.closeButtonText}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -569,6 +589,46 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 5,
         fontSize: 10,
+    },
+
+    // Location Error Modals styling
+    overlay: {
+        flex: 1,
+        justifyContent: "flex-end",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContainer1: {
+        width: "100%",
+        backgroundColor: "#F0F8FF",
+        padding: 20,
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        alignItems: "center",
+    },
+    modalTitle1: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: 'black',
+    },
+    modalMessage1: {
+        fontSize: 16,
+        marginBottom: 40,
+        textAlign: "center",
+        color: 'black',
+    },
+    closeButton: {
+        backgroundColor: '#F3592C',
+        padding: 10,
+        borderRadius: 5,
+        width: '100%',
+        alignItems: 'center',
+    },
+    closeButtonText: {
+        color: 'white',
+        fontSize: 17,
+        fontWeight: 'bold',
     },
 });
 
